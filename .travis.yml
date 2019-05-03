@@ -9,9 +9,16 @@ env:
   - BRANCH=0.19.4
   - BRANCH=#4f9366975441be889a8cd4fbfb4e41f6830dc542
 
+matrix:
+  exclude:
+  # Skip devel on Windows due to choosenim #117
+  - os: windows
+    env: BRANCH=#4f9366975441be889a8cd4fbfb4e41f6830dc542
+
 cache:
   directories:
     - "$HOME/.choosenim/toolchains/nim-0.19.4"
+    - "$HOME/.choosenim/toolchains/nim-#4f9366975441be889a8cd4fbfb4e41f6830dc542"
 
 install:
   - export CHOOSENIM_CHOOSE_VERSION=$BRANCH

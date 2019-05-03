@@ -428,7 +428,7 @@ test "issue #349":
 
   proc checkName(name: string) =
     when defined(windows):
-      if name.toLowerAscii() in @["con", "nul"]:
+      if name.toLowerAscii() in @["con", "nul", "aux", "prn"]:
         return
     let (outp, code) = execNimble("init", "-y", name)
     let msg = outp.strip.processOutput()
