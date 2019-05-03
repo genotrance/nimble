@@ -16,7 +16,7 @@ cache:
 install:
   - export CHOOSENIM_CHOOSE_VERSION=$BRANCH
   - |
-      curl https://nim-lang.org/choosenim/init.sh -sSf > init.sh
+      curl https://raw.githubusercontent.com/dom96/choosenim/master/scripts/choosenim-unix-init.sh -sSf > init.sh
       sh init.sh -y
 
 before_script:
