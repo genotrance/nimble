@@ -9,6 +9,7 @@ env:
   - BRANCH=0.19.6
   - BRANCH=0.20.2
   # This is the latest working Nim version against which Nimble is being tested
+  # Update in cache:directories as well
   - BRANCH=#2565d3d102efd21ba02ed1f3b96d892fe2637d2b
 
 cache:
@@ -18,24 +19,27 @@ cache:
     - "$HOME/.choosenim/toolchains/nim-#2565d3d102efd21ba02ed1f3b96d892fe2637d2b"
 
 install:
-   - export CHOOSENIM_NO_ANALYTICS=1
-   - export PATH=$HOME/.nimble/bin:$PATH
-   - uname -a
-   - |
-     if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then
-       # Latest choosenim binary doesn't have https://github.com/dom96/choosenim/pull/117
-       #
-       # Use custom build with fix for Windows
-       curl -L -s "https://bintray.com/genotrance/binaries/download_file?file_path=choosenim.exe" -o choosenim.exe
-       curl -L -s "https://bintray.com/genotrance/binaries/download_file?file_path=libeay32.dll" -o libeay32.dll
-       curl -L -s "https://bintray.com/genotrance/binaries/download_file?file_path=ssleay32.dll" -o ssleay32.dll
-       ./choosenim.exe $BRANCH -y
-       cd `./choosenim.exe show | grep Path | cut -f 8 -d " "` && ./koch.exe --latest nimble && cd -
-     else
-       export CHOOSENIM_CHOOSE_VERSION=$BRANCH
-       curl https://nim-lang.org/choosenim/init.sh -sSf > init.sh
-       sh init.sh -y
-     fi
+  - export CHOOSENIM_NO_ANALYTICS=1
+  - export PATH=$HOME/.nimble/bin:$PATH
+  - |
+    if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then
+      # Latest choosenim binary doesn't have
+      #   https://github.com/dom96/choosenim/pull/117
+      #   https://github.com/dom96/choosenim/pull/135
+      #
+      # Using custom build with these PRs for Windows
+      curl -L -s "https://bintray.com/genotrance/binaries/download_file?file_path=choosenim.exe" -o choosenim.exe
+      curl -L -s "https://bintray.com/genotrance/binaries/download_file?file_path=libeay32.dll" -o libeay32.dll
+      curl -L -s "https://bintray.com/genotrance/binaries/download_file?file_path=ssleay32.dll" -o ssleay32.dll
+      ./choosenim.exe $BRANCH -y
+      # 0.19.6 and 0.20.2 have nimble with issue #665
+      # Updating nimble to avoid failure with tests for #280 and #524
+      cd `./choosenim.exe show | grep Path | cut -f 8 -d " "` && ./koch.exe --latest nimble && cd -
+    else
+      export CHOOSENIM_CHOOSE_VERSION=$BRANCH
+      curl https://nim-lang.org/choosenim/init.sh -sSf > init.sh
+      sh init.sh -y
+    fi
 
 script:
   - cd tests
