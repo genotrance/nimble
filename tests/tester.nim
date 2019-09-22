@@ -458,17 +458,17 @@ test "issue #349":
   ]
 
   proc checkName(name: string) =
-    when defined(windows):
-      if name.toLowerAscii() in @["con", "nul"]:
-        return
     let (outp, code) = execNimble("init", "-y", name)
     let msg = outp.strip.processOutput()
     check code == QuitFailure
     check inLines(msg,
       "\"$1\" is an invalid package name: reserved name" % name)
-    removeFile(name.changeFileExt("nimble"))
-    removeDir("src")
-    removeDir("tests")
+    try:
+      removeFile(name.changeFileExt("nimble"))
+      removeDir("src")
+      removeDir("tests")
+    except OSError:
+      discard
 
   for reserved in reservedNames:
     checkName(reserved.toUpperAscii())

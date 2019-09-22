@@ -1,4 +1,5 @@
 os:
+  - windows
   - linux
   - osx
 
@@ -14,16 +15,27 @@ cache:
   directories:
     - "$HOME/.choosenim/toolchains/nim-0.19.6"
     - "$HOME/.choosenim/toolchains/nim-0.20.2"
+    - "$HOME/.choosenim/toolchains/nim-#2565d3d102efd21ba02ed1f3b96d892fe2637d2b"
 
 install:
-  - export CHOOSENIM_CHOOSE_VERSION=$BRANCH
-  - |
-      curl https://nim-lang.org/choosenim/init.sh -sSf > init.sh
-      sh init.sh -y
-
-before_script:
-  - export CHOOSENIM_NO_ANALYTICS=1
-  - export PATH=$HOME/.nimble/bin:$PATH
+   - export CHOOSENIM_NO_ANALYTICS=1
+   - export PATH=$HOME/.nimble/bin:$PATH
+   - uname -a
+   - |
+     if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then
+       # Latest choosenim binary doesn't have https://github.com/dom96/choosenim/pull/117
+       #
+       # Use custom build with fix for Windows
+       curl -L -s "https://bintray.com/genotrance/binaries/download_file?file_path=choosenim.exe" -o choosenim.exe
+       curl -L -s "https://bintray.com/genotrance/binaries/download_file?file_path=libeay32.dll" -o libeay32.dll
+       curl -L -s "https://bintray.com/genotrance/binaries/download_file?file_path=ssleay32.dll" -o ssleay32.dll
+       ./choosenim.exe $BRANCH -y
+       cd `./choosenim.exe show | grep Path | cut -f 8 -d " "` && ./koch.exe --latest nimble && cd -
+     else
+       export CHOOSENIM_CHOOSE_VERSION=$BRANCH
+       curl https://nim-lang.org/choosenim/init.sh -sSf > init.sh
+       sh init.sh -y
+     fi
 
 script:
   - cd tests

@@ -41,7 +41,7 @@ proc execNimscript(nimsFile, projectDir, actionName: string, options: Options):
 
   var cmd = (
     "nim e $# -p:$# $# $# $#" % [
-      "--hints:off --warning[UnusedImport]:off --verbosity:0",
+      "--hints:off --verbosity:0",
       (getTempDir() / "nimblecache").quoteShell,
       nimsFileCopied.quoteShell,
       outFile.quoteShell,
