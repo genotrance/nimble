@@ -1111,6 +1111,16 @@ proc check(options: Options) =
     display("Failure:", "Validation failed", Error, HighPriority)
     quit(QuitFailure)
 
+proc useCfg(options: Options) =
+  let
+    pkgInfo = getPkgInfo(getCurrentDir(), options)
+    nimblePkg = getPkgsDir(options)
+  for pkg in processDeps(pkgInfo, options):
+    if pkg.myPath.startsWith(nimblePkg):
+      echo "--path:\"$nimbleDir" & pkg.myPath.parentDir()[nimblePkg.len .. ^1] & "\""
+    else:
+      echo "Package not in nimbleDir: " & pkg.myPath
+
 proc run(options: Options) =
   # Verify parameters.
   let binary = options.getCompilationBinary().get("")
@@ -1190,6 +1200,8 @@ proc doAction(options: var Options) =
     develop(options)
   of actionCheck:
     check(options)
+  of actionUseCfg:
+    useCfg(options)
   of actionNil:
     assert false
   of actionCustom:

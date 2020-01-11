@@ -36,11 +36,11 @@ type
     actionInstall, actionSearch,
     actionList, actionBuild, actionPath, actionUninstall, actionCompile,
     actionDoc, actionCustom, actionTasks, actionDevelop, actionCheck,
-    actionRun
+    actionRun, actionUseCfg
 
   Action* = object
     case typ*: ActionType
-    of actionNil, actionList, actionPublish, actionTasks, actionCheck: nil
+    of actionNil, actionList, actionPublish, actionTasks, actionCheck, actionUseCfg: nil
     of actionRefresh:
       optionalURL*: string # Overrides default package list.
     of actionInstall, actionPath, actionUninstall, actionDevelop:
@@ -116,7 +116,8 @@ Commands:
                                   external tools. The argument can be a
                                   .nimble file, a project directory or
                                   the name of an installed package.
-
+  usecfg                          Configure Nimble to set all project dependency
+                                  paths explicitly in nim.cfg
 
 Options:
   -h, --help                      Print this help message.
@@ -186,6 +187,8 @@ proc parseActionType*(action: string): ActionType =
     result = actionDevelop
   of "check":
     result = actionCheck
+  of "usecfg":
+    result = actionUseCfg
   else:
     result = actionCustom
 
@@ -218,7 +221,7 @@ proc initAction*(options: var Options, key: string) =
     options.action.arguments = @[]
     options.action.flags = newStringTable()
   of actionPublish, actionList, actionTasks, actionCheck, actionRun,
-     actionNil: discard
+     actionNil, actionUseCfg: discard
 
 proc prompt*(options: Options, question: string): bool =
   ## Asks an interactive question and returns the result.
